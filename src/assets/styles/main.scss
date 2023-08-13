@@ -7,10 +7,14 @@
   src: url(../fonts/Windlass.ttf);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
-  height: 90dvh;
-  width: 90dvw;
-  margin: 5dvh;
+  height: calc(100dvh - 20px);
+  width: calc(100dvw - 20px);
+  margin: 10px;
   display: flex;
   align-items: center;
   justify-content: center;

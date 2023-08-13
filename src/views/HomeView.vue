@@ -99,8 +99,6 @@ export default defineComponent({
 main {
   display: grid;
   grid-template-columns: auto auto;
-  align-items: center;
-  justify-content: center;
   gap: 1rem;
   max-height: 100%;
 }
@@ -117,7 +115,7 @@ main {
   grid-template-columns: 1fr 1fr;
   grid-auto-rows: min-content;
   gap: 10px;
-  margin-bottom: 5dvh;
+  margin-bottom: 10px;
 
   & > *:nth-child(-n + 2),
   & > *:nth-last-child(3) {
@@ -191,6 +189,17 @@ main {
         background-position: left;
       }
     }
+  }
+}
+
+@media screen and (max-width: 700px) {
+  main {
+    display: flex;
+    // grid-template-columns: auto auto;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: none;
+    max-width: 100%;
   }
 }
 </style>
