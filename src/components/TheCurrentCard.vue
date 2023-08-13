@@ -106,6 +106,7 @@ export default defineComponent({
   color: #fff;
   background-position: right;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .card-selection {

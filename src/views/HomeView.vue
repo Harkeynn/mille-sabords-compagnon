@@ -115,7 +115,8 @@ main {
     0 1px 5px 0 rgba(0, 0, 0, 0.2);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  grid-auto-rows: min-content;
+  gap: 10px;
   margin-bottom: 5dvh;
 
   & > *:nth-child(-n + 2),
@@ -137,6 +138,7 @@ main {
     cursor: pointer;
     overflow: hidden;
     justify-content: center;
+    height: 50px;
 
     input {
       display: none;

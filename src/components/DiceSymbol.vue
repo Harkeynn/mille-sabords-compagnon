@@ -55,12 +55,14 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   gap: 0.25rem 0.5rem;
-  margin-bottom: 0.5rem;
 
   h3 {
     flex: 1 1 100%;
     text-align: center;
     margin-bottom: 0;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
 
     img {
       border: 2px solid $main;
