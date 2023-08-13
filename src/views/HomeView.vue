@@ -22,7 +22,7 @@ import TheCurrentCard from '@/components/TheCurrentCard.vue'
 import ThePlayerList from '@/components/ThePlayerList.vue'
 import AnimatedNumber from '@/components/AnimatedNumber.vue'
 import { usePlayersStore, useRollStore } from '@/stores'
-import { Symbol } from '@/utils/types'
+import type { Symbol } from '@/utils/types'
 import { mapState, mapWritableState } from 'pinia'
 
 export default defineComponent({

@@ -8,8 +8,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { Symbol } from '@/utils/types'
+import type { PropType } from 'vue'
+import { defineComponent } from 'vue'
+import type { Symbol } from '@/utils/types'
 import { mapState, mapWritableState } from 'pinia'
 import { useRollStore } from '@/stores'
 
@@ -39,7 +40,7 @@ export default defineComponent({
       )
     },
     imgPath() {
-      return new URL(`../assets/img/${this.type}.png`, import.meta.url).href
+      return new URL(`../assets/img/symbols/${this.type}.png`, import.meta.url).href
     }
   }
 })

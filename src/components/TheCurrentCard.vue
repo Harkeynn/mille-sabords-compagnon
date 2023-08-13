@@ -19,8 +19,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { Card } from '@/utils/types'
+import { defineComponent } from 'vue'
+import type { Card } from '@/utils/types'
 import { mapWritableState } from 'pinia'
 import { useRollStore } from '@/stores'
 
@@ -40,7 +40,7 @@ export default defineComponent({
         'coin',
         'diamond',
         'animals'
-      ] as (Card | null)[],
+      ] as Card[],
       cardSelection: false
     }
   },
