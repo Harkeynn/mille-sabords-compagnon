@@ -1,0 +1,31 @@
+button {
+  background: $main;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: Windlass;
+  cursor: pointer;
+  color: #fff;
+  font-size: 1.1rem;
+  transition: 0.3s;
+
+  &:hover {
+    background: $main-light;
+  }
+
+  &.round {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  &:disabled {
+    pointer-events: none;
+    background: #a5a5a5;
+    color: #4b4b4b;
+  }
+}

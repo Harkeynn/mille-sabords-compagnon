@@ -1,0 +1,25 @@
+@import './variables';
+@import './button';
+@import './input';
+
+@font-face {
+  font-family: Windlass;
+  src: url(../fonts/Windlass.ttf);
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-family: Windlass;
+  background: url(../img/background.jpg) no-repeat center center fixed;
+  background-size: cover;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
