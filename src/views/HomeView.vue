@@ -102,6 +102,7 @@ main {
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  max-height: 100%;
 }
 
 .current-roll {
@@ -115,6 +116,7 @@ main {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+  margin-bottom: 5dvh;
 
   & > *:nth-child(-n + 2),
   & > *:nth-last-child(3) {
