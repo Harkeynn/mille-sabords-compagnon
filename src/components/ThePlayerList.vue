@@ -99,6 +99,7 @@ ul {
 
         input {
           width: 100%;
+          line-height: 2rem;
         }
       }
     }
