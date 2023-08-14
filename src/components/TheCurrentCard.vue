@@ -3,12 +3,15 @@
     <Teleport to="body">
       <transition name="card-selection-">
         <div class="card-selection--overlay" v-if="cardSelection" @click="cardSelection = false">
-          <ul class="card-selection--modal" @click.stop>
-            <li v-for="card of cards" :key="card" @click="selectCard(card)">
-              <img :src="getCardImg(card)" :alt="card" />
-              <span>{{ getCardLabel(card) }}</span>
-            </li>
-          </ul>
+          <div class="card-selection--modal" @click.stop>
+            <button class="round" @click="cardSelection = false">x</button>
+            <ul>
+              <li v-for="card of cards" :key="card" @click="selectCard(card)">
+                <img :src="getCardImg(card)" :alt="card" />
+                <span>{{ getCardLabel(card) }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </transition>
     </Teleport>
@@ -131,54 +134,67 @@ export default defineComponent({
       0 1px 5px 0 rgba(0, 0, 0, 0.2);
     max-height: 90vh;
     overflow: auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
     transition: 0.3s;
-    li {
-      max-width: 200px;
-      cursor: pointer;
-      position: relative;
-      display: flex;
-      border-radius: 12px;
-      overflow: hidden;
+    position: relative;
 
-      img {
-        width: 100%;
+    & > button {
+      position: fixed;
+      right: 1rem;
+      z-index: 1;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12),
+        0 1px 5px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    ul {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+
+      li {
+        max-width: 200px;
+        cursor: pointer;
         position: relative;
-        z-index: 0;
-      }
+        display: flex;
+        border-radius: 12px;
+        overflow: hidden;
 
-      span {
-        position: absolute;
-        bottom: 0.5rem;
-        z-index: 2;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: #fff;
-        transition: 0.3s;
-      }
+        img {
+          width: 100%;
+          position: relative;
+          z-index: 0;
+        }
 
-      &::after {
-        content: '';
-        display: inline-block;
-        position: absolute;
-        left: 0;
-        width: 100%;
-        bottom: 0;
-        height: 20%;
-        background: linear-gradient(to top, #222 20%, transparent);
-        transition: 0.3s;
-      }
-
-      &:hover {
         span {
-          transform: translateY(-1rem);
+          position: absolute;
+          bottom: 0.5rem;
+          z-index: 2;
+          left: 0;
+          width: 100%;
+          text-align: center;
+          color: #fff;
+          transition: 0.3s;
         }
 
         &::after {
-          height: 40%;
+          content: '';
+          display: inline-block;
+          position: absolute;
+          left: 0;
+          width: 100%;
+          bottom: 0;
+          height: 20%;
+          background: linear-gradient(to top, #222 20%, transparent);
+          transition: 0.3s;
+        }
+
+        &:hover {
+          span {
+            transform: translateY(-1rem);
+          }
+
+          &::after {
+            height: 40%;
+          }
         }
       }
     }
