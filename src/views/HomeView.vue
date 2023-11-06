@@ -50,6 +50,7 @@ export default defineComponent({
   },
   methods: {
     reset() {
+      this.currentPlayerId = null
       this.currentCard = null
       this.symbols = {
         skull: 0,

@@ -1,5 +1,10 @@
 <template>
-  <ul>
+  <ul
+    :style="{
+      top: currentPlayerId && `calc((48px + 1rem) * -${players.length + 1})`,
+      position: currentPlayerId ? 'sticky' : 'relative'
+    }"
+  >
     <li
       v-for="player of players"
       :key="player.id"
@@ -18,7 +23,7 @@
     <li>
       <form @submit.prevent>
         <label>
-          <input type="text" v-model="newPlayerName" placeholder="Nom du joueur" />
+          <input type="text" v-model="newPlayerName" placeholder="Nom du joueur" maxlength="20" />
         </label>
         <button @click="addPlayer" :disabled="isNewPlayerDisabled">Ajouter un joueur</button>
       </form>
@@ -68,6 +73,8 @@ export default defineComponent({
 
 ul {
   height: 100%;
+  z-index: 1;
+  position: sticky;
   padding: 1rem;
   border-radius: 4px;
   background: rgba($color: #fff, $alpha: 0.5);
@@ -129,6 +136,10 @@ ul {
       }
 
       &.active {
+        position: sticky;
+        z-index: 1;
+        top: 1rem;
+        bottom: -2000px;
         span {
           color: #fff;
 
