@@ -69,7 +69,9 @@ export default defineComponent({
       this.isSkullIsland = false
     },
     validate() {
-      const currentPlayer: Player = this.players.find(({ id }) => id === this.currentPlayerId)
+      const currentPlayer: Player | undefined = this.players.find(
+        ({ id }) => id === this.currentPlayerId
+      )
       if (!currentPlayer) {
         this.reset()
         return
