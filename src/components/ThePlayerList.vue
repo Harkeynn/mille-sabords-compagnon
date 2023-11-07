@@ -1,7 +1,7 @@
 <template>
   <ul
     :style="{
-      top: currentPlayerId ? `calc((48px + 1rem) * -${players.length + 1})` : undefined,
+      top: currentPlayerId ? `calc((48px + 1rem) * -${players.length + 0.667})` : undefined,
       position: currentPlayerId ? 'sticky' : 'relative'
     }"
   >
