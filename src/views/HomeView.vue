@@ -1,7 +1,8 @@
 <template>
   <main>
+    <GameRecap />
     <ThePlayerList />
-    <div class="current-roll">
+    <div class="current-roll" v-if="gameStarted">
       <TheCurrentCard />
       <label for="isSkullIsland" class="skull-island-toggler">
         <span>Ile de la Tete de Mort <i>ß</i></span>
@@ -16,14 +17,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import AnimatedNumber from '@/components/AnimatedNumber.vue'
 import DiceSymbol from '@/components/DiceSymbol.vue'
+import GameRecap from '@/components/GameRecap.vue'
 import TheCurrentCard from '@/components/TheCurrentCard.vue'
 import ThePlayerList from '@/components/ThePlayerList.vue'
-import AnimatedNumber from '@/components/AnimatedNumber.vue'
-import { usePlayersStore, useRollStore } from '@/stores'
-import type { Symbol } from '@/utils/types'
+import { useGameStore, usePlayersStore, useRollStore } from '@/stores'
+import type { HistoryItem, Player, Symbol } from '@/utils/types'
 import { mapState, mapWritableState } from 'pinia'
+import { v4 as uuid } from 'uuid'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'HomeView',
@@ -31,10 +34,13 @@ export default defineComponent({
     DiceSymbol,
     TheCurrentCard,
     ThePlayerList,
-    AnimatedNumber
+    AnimatedNumber,
+    GameRecap
   },
   computed: {
     ...mapState(useRollStore, ['points']),
+    ...mapState(useGameStore, ['gameStarted']),
+    ...mapWritableState(useGameStore, ['history']),
     ...mapWritableState(useRollStore, ['currentCard', 'symbols', 'isSkullIsland']),
     ...mapWritableState(usePlayersStore, ['players', 'currentPlayerId']),
     symbolKeys() {
@@ -63,6 +69,11 @@ export default defineComponent({
       this.isSkullIsland = false
     },
     validate() {
+      const currentPlayer: Player = this.players.find(({ id }) => id === this.currentPlayerId)
+      if (!currentPlayer) {
+        this.reset()
+        return
+      }
       if (this.isSkullIsland) {
         this.players
           .filter(({ id }) => id !== this.currentPlayerId)
@@ -73,14 +84,16 @@ export default defineComponent({
             }
           })
       } else {
-        const currentPlayer = this.players.find(({ id }) => id === this.currentPlayerId)
-        if (currentPlayer) {
-          currentPlayer.score += this.points
-          if (currentPlayer.score < 0) {
-            currentPlayer.score = 0
-          }
+        currentPlayer.score += this.points
+        if (currentPlayer.score < 0) {
+          currentPlayer.score = 0
         }
       }
+      this.history.push({
+        id: uuid(),
+        playerId: currentPlayer.id,
+        score: this.points
+      } as HistoryItem)
       this.reset()
     }
   },

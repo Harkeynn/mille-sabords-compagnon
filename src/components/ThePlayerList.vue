@@ -1,7 +1,7 @@
 <template>
   <ul
     :style="{
-      top: currentPlayerId && `calc((48px + 1rem) * -${players.length + 1})`,
+      top: currentPlayerId && `calc((48px + 1rem) * -${players.length})`,
       position: currentPlayerId ? 'sticky' : 'relative'
     }"
   >
@@ -11,48 +11,92 @@
       @click="currentPlayerId = player.id"
       :class="{ active: currentPlayerId === player.id }"
     >
-      <span>{{ player.name }} - <AnimatedNumber :value="player.score" /></span>
-      <button
-        class="round"
-        style="font-size: 1rem; width: 2rem; height: 2rem"
-        @click="removePlayer(player.id)"
-      >
-        x
-      </button>
+      <p>
+        <span>{{ player.name }}</span>
+        <transition name="fade-right">
+          <AnimatedNumber v-if="gameStarted" :value="player.score" />
+        </transition>
+      </p>
+      <transition name="fade-right">
+        <button
+          class="round"
+          style="font-size: 1rem; width: 2rem; height: 2rem"
+          v-if="!gameStarted"
+          @click="removePlayer(player.id)"
+        >
+          x
+        </button>
+      </transition>
     </li>
     <li>
-      <form @submit.prevent>
+      <form @submit.prevent v-if="!gameStarted">
         <label>
-          <input type="text" v-model="newPlayerName" placeholder="Nom du joueur" maxlength="20" />
+          <input type="text" v-model="newPlayerName" placeholder="Nom du joueur" maxlength="15" />
         </label>
         <button @click="addPlayer" :disabled="isNewPlayerDisabled">Ajouter un joueur</button>
       </form>
+      <div class="history-actions" v-else>
+        <button @click="undo" :disabled="history.length === 0">
+          <FontAwesomeIcon :icon="['fas', 'clock-rotate-left']" />
+        </button>
+        <button
+          @click="redo"
+          :style="{
+            transform: 'scaleX(-1)'
+          }"
+          :disabled="reversedActions.length === 0"
+        >
+          <FontAwesomeIcon :icon="['fas', 'clock-rotate-left']" />
+        </button>
+      </div>
+      <button @click="toggleGame" :disabled="!!newPlayerName || players.length < 2">
+        {{ gameStarted ? 'Arreter' : 'Demarrer' }} la partie
+      </button>
     </li>
+    <VModal v-model="showWarning" hideCloseButton>
+      <div class="endgame-warning">
+        <p>Voulez-vous vraiment terminer cette partie ?</p>
+        <div>
+          <button @click="showWarning = false">Non</button>
+          <button @click="endGame">Oui</button>
+        </div>
+      </div>
+    </VModal>
   </ul>
 </template>
 
 <script lang="ts">
-import { usePlayersStore } from '@/stores'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { useGameStore, usePlayersStore } from '@/stores'
+import type { HistoryItem, Player } from '@/utils/types'
 import { mapWritableState } from 'pinia'
+import { v4 as uuid } from 'uuid'
 import { defineComponent } from 'vue'
 import AnimatedNumber from './AnimatedNumber.vue'
-import { v4 as uuid } from 'uuid'
+import VModal from './VModal.vue'
 
 export default defineComponent({
   name: 'ThePlayerList',
   components: {
-    AnimatedNumber
+    AnimatedNumber,
+    FontAwesomeIcon,
+    VModal
   },
   data() {
     return {
-      newPlayerName: ''
+      newPlayerName: '',
+      showWarning: false
     }
   },
   computed: {
     ...mapWritableState(usePlayersStore, ['players', 'currentPlayerId']),
+    ...mapWritableState(useGameStore, ['gameStarted', 'history', 'reversedActions']),
     isNewPlayerDisabled() {
-      const alreadyExist = this.players.map(({ name }) => name).includes(this.newPlayerName)
-      return !this.newPlayerName || this.newPlayerName.length === 0 || alreadyExist
+      const trimedName = this.newPlayerName.replace(/^\s+|\s+$/g, '')
+      const alreadyExist = this.players
+        .map(({ name }) => name.replace(/^\s+|\s+$/g, ''))
+        .includes(trimedName)
+      return !trimedName || trimedName.length === 0 || alreadyExist
     }
   },
   methods: {
@@ -61,8 +105,72 @@ export default defineComponent({
       this.players.splice(indexToRemove, 1)
     },
     addPlayer() {
-      this.players.push({ id: uuid(), name: this.newPlayerName, score: 0 })
+      this.players.push({
+        id: uuid(),
+        name: this.newPlayerName.replace(/^\s+|\s+$/g, ''),
+        score: 0,
+        bestRound: 0,
+        nbBoatsLoose: 0,
+        nbBoatsWin: 0,
+        nbCaptain: 0,
+        nbCoins: 0,
+        nbDiamonds: 0,
+        nbPet: 0,
+        nbVault: 0,
+        nbWarden: 0,
+        skullIslandTotal: 0
+      } as Player)
       this.newPlayerName = ''
+    },
+    toggleGame() {
+      // Reset players' score when game starts
+      if (this.gameStarted) {
+        this.showWarning = true
+      } else {
+        this.players.forEach((player: Player) => {
+          player.score = 0
+        })
+        this.gameStarted = true
+      }
+    },
+    endGame() {
+      this.showWarning = false
+      this.gameStarted = false
+    },
+    undo() {
+      if (this.history.length > 0) {
+        const action: HistoryItem = this.history.splice(this.history.length - 1, 1)[0]
+        this.reversedActions.push(action)
+
+        this.players = this.players.map((player: Player) => {
+          if (player.id !== action.playerId) {
+            return player
+          }
+          return {
+            ...player,
+            score: player.score - action.score
+          }
+        })
+      }
+    },
+    redo() {
+      if (this.reversedActions.length > 0) {
+        const action: HistoryItem = this.reversedActions.splice(
+          this.reversedActions.length - 1,
+          1
+        )[0]
+        this.history.push(action)
+
+        this.players = this.players.map((player: Player) => {
+          if (player.id !== action.playerId) {
+            return player
+          }
+          return {
+            ...player,
+            score: player.score + action.score
+          }
+        })
+      }
     }
   }
 })
@@ -80,6 +188,7 @@ ul {
   background: rgba($color: #fff, $alpha: 0.5);
   display: flex;
   flex-direction: column;
+  min-width: 316px;
   gap: 1rem;
   backdrop-filter: blur(4px);
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12),
@@ -91,22 +200,51 @@ ul {
     align-items: center;
     position: relative;
 
-    span {
+    p {
+      height: 32px;
       transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0;
+      width: 100%;
+
+      span {
+        transition: 0.3s;
+
+        &:nth-of-type(2) {
+          font-weight: bold;
+        }
+      }
     }
 
     &:last-of-type {
       margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      & > * {
+        width: 100%;
+      }
 
       form {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        width: 100%;
 
         input {
           width: 100%;
           line-height: 2rem;
+        }
+      }
+
+      .history-actions {
+        display: flex;
+        gap: 0.5rem;
+
+        button {
+          flex: 1;
         }
       }
     }
@@ -153,6 +291,33 @@ ul {
         }
       }
     }
+  }
+}
+
+.fade-right-enter-active,
+.fade-right-leave-active {
+  transition: 0.3s;
+}
+
+.fade-right-leave-active {
+  position: absolute;
+  right: 0.5rem;
+}
+
+.fade-right-enter-from,
+.fade-right-leave-to {
+  opacity: 0;
+  transform: translateX(0.5rem);
+}
+
+.endgame-warning {
+  p {
+    margin-top: 0;
+  }
+
+  div {
+    display: flex;
+    justify-content: space-around;
   }
 }
 </style>

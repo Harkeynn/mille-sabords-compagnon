@@ -17,4 +17,20 @@ export interface Player {
   id: string
   name: string
   score: number
+  bestRound: number
+  skullIslandTotal: number
+  nbBoatsLoose: number
+  nbBoatsWin: number
+  nbCaptain: number
+  nbCoins: number
+  nbDiamonds: number
+  nbPet: number
+  nbVault: number
+  nbWarden: number
+}
+
+export interface HistoryItem {
+  id: string
+  playerId: string
+  score: number
 }

@@ -1,4 +1,5 @@
+import useGameStore from './game'
 import usePlayersStore from './players'
 import useRollStore from './roll'
 
-export { usePlayersStore, useRollStore }
+export { useGameStore, usePlayersStore, useRollStore }

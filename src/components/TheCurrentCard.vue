@@ -1,20 +1,13 @@
 <template>
   <div>
-    <Teleport to="body">
-      <transition name="card-selection-">
-        <div class="card-selection--overlay" v-if="cardSelection" @click="cardSelection = false">
-          <div class="card-selection--modal" @click.stop>
-            <button class="round" @click="cardSelection = false">x</button>
-            <ul>
-              <li v-for="card of cards" :key="card" @click="selectCard(card)">
-                <img :src="getCardImg(card)" :alt="card" />
-                <span>{{ getCardLabel(card) }}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </transition>
-    </Teleport>
+    <VModal v-model="cardSelection">
+      <ul class="card-list">
+        <li v-for="card of cards" :key="card" @click="selectCard(card)">
+          <img :src="getCardImg(card)" :alt="card" />
+          <span>{{ getCardLabel(card) }}</span>
+        </li>
+      </ul>
+    </VModal>
     <div class="current-card" @click="cardSelection = true" :style="cardPreview">
       {{ getCardLabel(currentCard) }}
     </div>
@@ -22,13 +15,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { useRollStore } from '@/stores'
 import type { Card } from '@/utils/types'
 import { mapWritableState } from 'pinia'
-import { useRollStore } from '@/stores'
+import { defineComponent } from 'vue'
+import VModal from './VModal.vue'
 
 export default defineComponent({
   name: 'TheCurrentCard',
+  components: {
+    VModal
+  },
   data() {
     return {
       cards: [
@@ -112,99 +109,59 @@ export default defineComponent({
   border-radius: 4px;
 }
 
-.card-selection {
-  &--overlay {
-    position: fixed;
-    top: 0;
-    height: 100%;
-    left: 0;
-    width: 100%;
-    background: rgba($color: #000, $alpha: 0.3);
-    backdrop-filter: blur(2px);
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  &--modal {
-    background: #fff;
-    padding: 1rem;
-    border-radius: 4px;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12),
-      0 1px 5px 0 rgba(0, 0, 0, 0.2);
-    max-height: 90vh;
-    overflow: auto;
-    transition: 0.3s;
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-height: 90vh;
+  padding-bottom: 2rem;
+  overflow: auto;
+
+  li {
+    max-width: 200px;
+    cursor: pointer;
     position: relative;
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
 
-    & > button {
-      position: fixed;
-      right: 1rem;
-      z-index: 1;
-      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12),
-        0 1px 5px 0 rgba(0, 0, 0, 0.2);
+    img {
+      width: 100%;
+      position: relative;
+      z-index: 0;
     }
 
-    ul {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
+    span {
+      position: absolute;
+      bottom: 0.5rem;
+      z-index: 2;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      transition: 0.3s;
+    }
 
-      li {
-        max-width: 200px;
-        cursor: pointer;
-        position: relative;
-        display: flex;
-        border-radius: 12px;
-        overflow: hidden;
+    &::after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      bottom: 0;
+      height: 20%;
+      background: linear-gradient(to top, #222 20%, transparent);
+      transition: 0.3s;
+    }
 
-        img {
-          width: 100%;
-          position: relative;
-          z-index: 0;
-        }
-
-        span {
-          position: absolute;
-          bottom: 0.5rem;
-          z-index: 2;
-          left: 0;
-          width: 100%;
-          text-align: center;
-          color: #fff;
-          transition: 0.3s;
-        }
-
-        &::after {
-          content: '';
-          display: inline-block;
-          position: absolute;
-          left: 0;
-          width: 100%;
-          bottom: 0;
-          height: 20%;
-          background: linear-gradient(to top, #222 20%, transparent);
-          transition: 0.3s;
-        }
-
-        &:hover {
-          span {
-            transform: translateY(-1rem);
-          }
-
-          &::after {
-            height: 40%;
-          }
-        }
+    &:hover {
+      span {
+        transform: translateY(-1rem);
       }
-    }
-  }
-  &--enter-from,
-  &--leave-to {
-    opacity: 0;
 
-    .card-selection--modal {
-      transform: scale(0);
+      &::after {
+        height: 40%;
+      }
     }
   }
 }
