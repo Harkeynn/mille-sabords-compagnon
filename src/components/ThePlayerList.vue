@@ -161,7 +161,7 @@ export default defineComponent({
             }, player as Player),
             score: player.score - action.points,
             bestRound: Math.max(
-              this.history
+              ...this.history
                 .filter(({ playerId }) => playerId === player.id)
                 .map(({ points }) => points),
             ),

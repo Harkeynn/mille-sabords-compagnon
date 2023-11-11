@@ -43,16 +43,16 @@ export interface StatItem {
 }
 
 export interface Stats {
-  bestRound?: number;
-  nbCaptains?: number;
-  nbChests?: number;
-  nbGuardians?: number;
-  nbRoundsLost?: number;
-  nbShipsLoose?: number;
-  nbShipsWin?: number;
-  petsTotal?: number;
-  skullIslandTotal?: number;
-  treasuresTotal?: number;
+  bestRound: number;
+  nbCaptains: number;
+  nbChests: number;
+  nbGuardians: number;
+  nbRoundsLost: number;
+  nbShipsLoose: number;
+  nbShipsWin: number;
+  petsTotal: number;
+  skullIslandTotal: number;
+  treasuresTotal: number;
 }
 
-export type BestStats = Record<keyof Stats, StatItem>;
+export type BestStats = Partial<Record<keyof Stats, StatItem>>;

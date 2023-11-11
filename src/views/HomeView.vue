@@ -91,7 +91,7 @@ export default defineComponent({
         currentPlayer.skullIslandTotal -= this.points;
       }
 
-      this.updatePlayerStats(this.currentPlayerId, this.rollStats);
+      this.updatePlayerStats(currentPlayer.id, this.rollStats);
       this.history.push({
         id: uuid(),
         playerId: currentPlayer.id,

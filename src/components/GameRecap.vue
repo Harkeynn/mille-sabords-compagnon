@@ -8,8 +8,8 @@
           <div :key="displayedStat">
             <h4>{{ statLabels[displayedStat].title }}</h4>
             <p>
-              {{ stats[displayedStat].playerName }} {{ statLabels[displayedStat].subtitle }} ({{
-                stats[displayedStat].points
+              {{ stats[displayedStat]?.playerName }} {{ statLabels[displayedStat].subtitle }} ({{
+                stats[displayedStat]?.points
               }}{{ statLabels[displayedStat].unit ? ` ${statLabels[displayedStat].unit}` : '' }})
             </p>
           </div>
@@ -22,11 +22,10 @@
 
 <script lang="ts">
 import { useGameStore, usePlayersStore } from '@/stores';
-import type { BestStats, Stats } from '@/utils/types';
+import type { BestStats, Player, Stats } from '@/utils/types';
 import { defineComponent } from 'vue';
 import { mapState } from 'pinia';
 import VModal from './VModal.vue';
-import { Player } from '@/utils/types';
 
 export default defineComponent({
   name: 'GameRecap',
@@ -34,8 +33,8 @@ export default defineComponent({
   data() {
     return {
       showResult: false,
-      statInterval: null,
-      displayedStat: null,
+      statInterval: undefined as undefined | number,
+      displayedStat: null as keyof Stats | null,
       statLabels: {
         bestRound: {
           title: "Tireur d'elite",
@@ -92,11 +91,12 @@ export default defineComponent({
     },
     stats(): BestStats {
       return this.players.reduce((result: BestStats, player: Player) => {
-        Object.keys(this.statLabels).forEach((key: keyof Stats) => {
-          if (player[key] > 0 && (!result[key] || result[key].points < player[key])) {
-            result[key] = {
+        Object.keys(this.statLabels).forEach((key) => {
+          const statKey = key as keyof Stats;
+          if (player[statKey] > 0 && (result[statKey]?.points || 0) < player[statKey]) {
+            result[statKey] = {
               playerName: player.name,
-              points: player[key],
+              points: player[statKey],
             };
           }
         });
@@ -107,8 +107,10 @@ export default defineComponent({
   methods: {
     setupDisplayedStat() {
       const statsArray = Object.keys(this.stats);
-      const statIndex = statsArray.indexOf(this.displayedStat);
-      this.displayedStat = statsArray[statIndex === statsArray.length - 1 ? 0 : statIndex + 1];
+      const statIndex = statsArray.indexOf(this.displayedStat as string);
+      this.displayedStat = statsArray[
+        statIndex === statsArray.length - 1 ? 0 : statIndex + 1
+      ] as keyof Stats;
     },
   },
   watch: {
