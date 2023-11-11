@@ -13,20 +13,10 @@ export type Card =
   | 'diamond'
   | 'animals';
 
-export interface Player {
+export interface Player extends Stats {
   id: string;
   name: string;
   score: number;
-  bestRound: number;
-  skullIslandTotal: number;
-  treasuresTotal: number;
-  petsTotal: number;
-  nbRoundsLost: number;
-  nbShipsLoose: number;
-  nbShipsWin: number;
-  nbCaptains: number;
-  nbChests: number;
-  nbGuardians: number;
 }
 
 export interface Roll {
@@ -46,3 +36,23 @@ export interface HistoryItem extends Roll {
   id: string;
   playerId: string;
 }
+
+export interface StatItem {
+  points: number;
+  playerName: string;
+}
+
+export interface Stats {
+  bestRound?: number;
+  nbCaptains?: number;
+  nbChests?: number;
+  nbGuardians?: number;
+  nbRoundsLost?: number;
+  nbShipsLoose?: number;
+  nbShipsWin?: number;
+  petsTotal?: number;
+  skullIslandTotal?: number;
+  treasuresTotal?: number;
+}
+
+export type BestStats = Record<keyof Stats, StatItem>;

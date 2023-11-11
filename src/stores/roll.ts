@@ -120,6 +120,7 @@ export default defineStore('roll', {
       } else if (this.points < 0) {
         // Ship lost & Skull Island
         if (isShipEncounter) {
+          result.nbRoundsLost++;
           result.nbShipsLoose++;
         } else {
           result.skullIslandTotal -= this.points;
