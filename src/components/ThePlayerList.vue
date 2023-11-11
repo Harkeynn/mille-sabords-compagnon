@@ -130,6 +130,16 @@ export default defineComponent({
       } else {
         this.players.forEach((player: Player) => {
           player.score = 0;
+          player.bestRound = 0;
+          player.nbCaptains = 0;
+          player.nbChests = 0;
+          player.nbGuardians = 0;
+          player.nbRoundsLost = 0;
+          player.nbShipsLoose = 0;
+          player.nbShipsWin = 0;
+          player.petsTotal = 0;
+          player.skullIslandTotal = 0;
+          player.treasuresTotal = 0;
         });
         this.gameStarted = true;
       }
