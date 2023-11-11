@@ -2,14 +2,14 @@
   <ul
     :style="{
       top: currentPlayerId ? `calc((48px + 1rem) * -${players.length + 0.667})` : undefined,
-      position: currentPlayerId ? 'sticky' : 'relative'
+      position: currentPlayerId ? 'sticky' : 'relative',
     }"
   >
     <li
       v-for="player of players"
       :key="player.id"
-      @click="currentPlayerId = player.id"
-      :class="{ active: currentPlayerId === player.id }"
+      @click="gameStarted ? (currentPlayerId = player.id) : undefined"
+      :class="{ active: currentPlayerId === player.id, interactable: gameStarted }"
     >
       <p>
         <span>{{ player.name }}</span>
@@ -42,7 +42,7 @@
         <button
           @click="redo"
           :style="{
-            transform: 'scaleX(-1)'
+            transform: 'scaleX(-1)',
           }"
           :disabled="reversedActions.length === 0"
         >
@@ -66,43 +66,44 @@
 </template>
 
 <script lang="ts">
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { useGameStore, usePlayersStore } from '@/stores'
-import type { HistoryItem, Player } from '@/utils/types'
-import { mapWritableState } from 'pinia'
-import { v4 as uuid } from 'uuid'
-import { defineComponent } from 'vue'
-import AnimatedNumber from './AnimatedNumber.vue'
-import VModal from './VModal.vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { useGameStore, usePlayersStore } from '@/stores';
+import type { HistoryItem, Player, Roll } from '@/utils/types';
+import { mapActions, mapWritableState } from 'pinia';
+import { v4 as uuid } from 'uuid';
+import { defineComponent } from 'vue';
+import AnimatedNumber from './AnimatedNumber.vue';
+import VModal from './VModal.vue';
 
 export default defineComponent({
   name: 'ThePlayerList',
   components: {
     AnimatedNumber,
     FontAwesomeIcon,
-    VModal
+    VModal,
   },
   data() {
     return {
       newPlayerName: '',
-      showWarning: false
-    }
+      showWarning: false,
+    };
   },
   computed: {
     ...mapWritableState(usePlayersStore, ['players', 'currentPlayerId']),
     ...mapWritableState(useGameStore, ['gameStarted', 'history', 'reversedActions']),
     isNewPlayerDisabled() {
-      const trimedName = this.newPlayerName.replace(/^\s+|\s+$/g, '')
+      const trimedName = this.newPlayerName.replace(/^\s+|\s+$/g, '');
       const alreadyExist = this.players
         .map(({ name }) => name.replace(/^\s+|\s+$/g, ''))
-        .includes(trimedName)
-      return !trimedName || trimedName.length === 0 || alreadyExist
-    }
+        .includes(trimedName);
+      return !trimedName || trimedName.length === 0 || alreadyExist;
+    },
   },
   methods: {
+    ...mapActions(usePlayersStore, ['updatePlayerStats']),
     removePlayer(playerId: string) {
-      const indexToRemove = this.players.findIndex(({ id }) => id === playerId)
-      this.players.splice(indexToRemove, 1)
+      const indexToRemove = this.players.findIndex(({ id }) => id === playerId);
+      this.players.splice(indexToRemove, 1);
     },
     addPlayer() {
       this.players.push({
@@ -110,70 +111,77 @@ export default defineComponent({
         name: this.newPlayerName.replace(/^\s+|\s+$/g, ''),
         score: 0,
         bestRound: 0,
-        nbBoatsLoose: 0,
-        nbBoatsWin: 0,
-        nbCaptain: 0,
-        nbCoins: 0,
-        nbDiamonds: 0,
-        nbPet: 0,
-        nbVault: 0,
-        nbWarden: 0,
-        skullIslandTotal: 0
-      } as Player)
-      this.newPlayerName = ''
+        nbShipsLoose: 0,
+        nbShipsWin: 0,
+        nbCaptains: 0,
+        nbRoundsLost: 0,
+        nbChests: 0,
+        nbGuardians: 0,
+        treasuresTotal: 0,
+        petsTotal: 0,
+        skullIslandTotal: 0,
+      } as Player);
+      this.newPlayerName = '';
     },
     toggleGame() {
       // Reset players' score when game starts
       if (this.gameStarted) {
-        this.showWarning = true
+        this.showWarning = true;
       } else {
         this.players.forEach((player: Player) => {
-          player.score = 0
-        })
-        this.gameStarted = true
+          player.score = 0;
+        });
+        this.gameStarted = true;
       }
     },
     endGame() {
-      this.showWarning = false
-      this.gameStarted = false
+      this.showWarning = false;
+      this.gameStarted = false;
+      this.currentPlayerId = null;
+      this.history = [];
+      this.reversedActions = [];
     },
     undo() {
       if (this.history.length > 0) {
-        const action: HistoryItem = this.history.splice(this.history.length - 1, 1)[0]
-        this.reversedActions.push(action)
+        const action: HistoryItem = this.history.splice(this.history.length - 1, 1)[0];
+        this.reversedActions.push(action);
 
         this.players = this.players.map((player: Player) => {
           if (player.id !== action.playerId) {
-            return player
+            return player;
           }
           return {
-            ...player,
-            score: player.score - action.score
-          }
-        })
+            ...Object.keys(player).reduce((result, key) => {
+              if (key !== 'id' && Object.prototype.hasOwnProperty.call(action, key)) {
+                (result[key as keyof Player] as number) -= action[
+                  key as keyof HistoryItem
+                ] as number;
+              }
+              return result;
+            }, player as Player),
+            score: player.score - action.points,
+            bestRound: Math.max(
+              this.history
+                .filter(({ playerId }) => playerId === player.id)
+                .map(({ points }) => points),
+            ),
+          } as Player;
+        });
       }
     },
     redo() {
       if (this.reversedActions.length > 0) {
         const action: HistoryItem = this.reversedActions.splice(
           this.reversedActions.length - 1,
-          1
-        )[0]
-        this.history.push(action)
+          1,
+        )[0];
+        this.history.push(action);
 
-        this.players = this.players.map((player: Player) => {
-          if (player.id !== action.playerId) {
-            return player
-          }
-          return {
-            ...player,
-            score: player.score + action.score
-          }
-        })
+        this.updatePlayerStats(action.playerId, action as Roll);
       }
-    }
-  }
-})
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
@@ -253,7 +261,10 @@ ul {
 
     &:not(:last-of-type) {
       padding: 0.5rem;
-      cursor: pointer;
+
+      &.interactable {
+        cursor: pointer;
+      }
 
       &::after {
         content: '';
@@ -271,11 +282,11 @@ ul {
         transition: 0.3s;
       }
 
-      &:hover::after {
+      &.interactable:hover::after {
         background-position: 85%;
       }
 
-      &.active {
+      &.interactable.active {
         position: sticky;
         z-index: 1;
         top: 1rem;

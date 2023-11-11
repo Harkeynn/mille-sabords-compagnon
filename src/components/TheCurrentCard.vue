@@ -15,16 +15,16 @@
 </template>
 
 <script lang="ts">
-import { useRollStore } from '@/stores'
-import type { Card } from '@/utils/types'
-import { mapWritableState } from 'pinia'
-import { defineComponent } from 'vue'
-import VModal from './VModal.vue'
+import { useRollStore } from '@/stores';
+import type { Card } from '@/utils/types';
+import { mapWritableState } from 'pinia';
+import { defineComponent } from 'vue';
+import VModal from './VModal.vue';
 
 export default defineComponent({
   name: 'TheCurrentCard',
   components: {
-    VModal
+    VModal,
   },
   data() {
     return {
@@ -39,62 +39,62 @@ export default defineComponent({
         'captain',
         'coin',
         'diamond',
-        'animals'
+        'animals',
       ] as Card[],
-      cardSelection: false
-    }
+      cardSelection: false,
+    };
   },
   computed: {
     ...mapWritableState(useRollStore, ['currentCard']),
     cardPreview() {
-      let imgPath = new URL('../assets/img/cards/all-preview.png', import.meta.url).href
+      let imgPath = new URL('../assets/img/cards/all-preview.png', import.meta.url).href;
       if (this.currentCard) {
         imgPath = new URL(`../assets/img/cards/${this.currentCard}-preview.png`, import.meta.url)
-          .href
+          .href;
       }
       return {
-        backgroundImage: `linear-gradient(to left, transparent 20%, #222 70%, #222), url("${imgPath}")`
-      }
-    }
+        backgroundImage: `linear-gradient(to left, transparent 20%, #222 70%, #222), url("${imgPath}")`,
+      };
+    },
   },
   methods: {
     getCardLabel(card: Card | null) {
       switch (card) {
         case 'chest':
-          return 'Coffre'
+          return 'Coffre';
         case 'captain':
-          return 'Capitaine'
+          return 'Capitaine';
         case 'skull1':
-          return '1 tete de mort'
+          return '1 tete de mort';
         case 'skull2':
-          return '2 tetes de mort'
+          return '2 tetes de mort';
         case 'guardian':
-          return 'Gardienne'
+          return 'Gardienne';
         case 'ship2':
-          return 'Bateau (2)'
+          return 'Bateau (2)';
         case 'ship3':
-          return 'Bateau (3)'
+          return 'Bateau (3)';
         case 'ship4':
-          return 'Bateau (4)'
+          return 'Bateau (4)';
         case 'coin':
-          return 'Piece'
+          return 'Piece';
         case 'diamond':
-          return 'Diamant'
+          return 'Diamant';
         case 'animals':
-          return 'Animaux'
+          return 'Animaux';
         default:
-          return 'Selectionner une carte'
+          return 'Selectionner une carte';
       }
     },
     getCardImg(card: Card) {
-      return new URL(`../assets/img/cards/${card}.png`, import.meta.url).href
+      return new URL(`../assets/img/cards/${card}.png`, import.meta.url).href;
     },
     selectCard(card: Card) {
-      this.currentCard = card
-      this.cardSelection = false
-    }
-  }
-})
+      this.currentCard = card;
+      this.cardSelection = false;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

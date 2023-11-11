@@ -17,16 +17,16 @@
 </template>
 
 <script lang="ts">
-import AnimatedNumber from '@/components/AnimatedNumber.vue'
-import DiceSymbol from '@/components/DiceSymbol.vue'
-import GameRecap from '@/components/GameRecap.vue'
-import TheCurrentCard from '@/components/TheCurrentCard.vue'
-import ThePlayerList from '@/components/ThePlayerList.vue'
-import { useGameStore, usePlayersStore, useRollStore } from '@/stores'
-import type { HistoryItem, Player, Symbol } from '@/utils/types'
-import { mapState, mapWritableState } from 'pinia'
-import { v4 as uuid } from 'uuid'
-import { defineComponent } from 'vue'
+import AnimatedNumber from '@/components/AnimatedNumber.vue';
+import DiceSymbol from '@/components/DiceSymbol.vue';
+import GameRecap from '@/components/GameRecap.vue';
+import TheCurrentCard from '@/components/TheCurrentCard.vue';
+import ThePlayerList from '@/components/ThePlayerList.vue';
+import { useGameStore, usePlayersStore, useRollStore } from '@/stores';
+import type { HistoryItem, Player, Symbol } from '@/utils/types';
+import { mapActions, mapState, mapWritableState } from 'pinia';
+import { v4 as uuid } from 'uuid';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'HomeView',
@@ -35,79 +35,80 @@ export default defineComponent({
     TheCurrentCard,
     ThePlayerList,
     AnimatedNumber,
-    GameRecap
+    GameRecap,
   },
   computed: {
-    ...mapState(useRollStore, ['points']),
+    ...mapState(useRollStore, ['points', 'computedSymbols', 'rollStats']),
     ...mapState(useGameStore, ['gameStarted']),
     ...mapWritableState(useGameStore, ['history', 'reversedActions']),
     ...mapWritableState(useRollStore, ['currentCard', 'symbols', 'isSkullIsland']),
     ...mapWritableState(usePlayersStore, ['players', 'currentPlayerId']),
     symbolKeys() {
-      return Object.keys(this.symbols) as Symbol[]
+      return Object.keys(this.symbols) as Symbol[];
     },
     cantValidate() {
       const diceNb = Object.values(this.symbols).reduce((result: number, value: number) => {
-        result += value
-        return result
-      }, 0)
-      return !this.currentPlayerId || !this.currentCard || diceNb !== 8
-    }
+        result += value;
+        return result;
+      }, 0);
+      return !this.currentPlayerId || !this.currentCard || diceNb !== 8;
+    },
   },
   methods: {
+    ...mapActions(usePlayersStore, ['updatePlayerStats']),
     reset() {
-      this.currentPlayerId = null
-      this.currentCard = null
+      this.currentPlayerId = null;
+      this.currentCard = null;
       this.symbols = {
         skull: 0,
         sword: 0,
         parrot: 0,
         monkey: 0,
         diamond: 0,
-        coin: 0
-      }
-      this.isSkullIsland = false
+        coin: 0,
+      };
+      this.isSkullIsland = false;
     },
     validate() {
-      const currentPlayer: Player | undefined = this.players.find(
-        ({ id }) => id === this.currentPlayerId
-      )
+      let currentPlayer: Player | undefined = this.players.find(
+        ({ id }) => id === this.currentPlayerId,
+      );
       if (!currentPlayer) {
-        this.reset()
-        return
+        this.reset();
+        return;
       }
+
+      // Proceed Skull Island
       if (this.isSkullIsland) {
         this.players
           .filter(({ id }) => id !== this.currentPlayerId)
           .forEach((player) => {
-            player.score += this.points
+            player.score += this.points;
             if (player.score < 0) {
-              player.score = 0
+              player.score = 0;
             }
-          })
-      } else {
-        currentPlayer.score += this.points
-        if (currentPlayer.score < 0) {
-          currentPlayer.score = 0
-        }
+          });
+        currentPlayer.skullIslandTotal -= this.points;
       }
+
+      this.updatePlayerStats(this.currentPlayerId, this.rollStats);
       this.history.push({
         id: uuid(),
         playerId: currentPlayer.id,
-        score: this.points
-      } as HistoryItem)
-      this.reversedActions = []
-      this.reset()
-    }
+        ...this.rollStats,
+      } as HistoryItem);
+      this.reversedActions = [];
+      this.reset();
+    },
   },
   watch: {
     isSkullIsland() {
       if (this.isSkullIsland) {
-        this.symbols.skull = 4
+        this.symbols.skull = 4;
       }
-    }
-  }
-})
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

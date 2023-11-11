@@ -1,4 +1,4 @@
-export type Symbol = 'skull' | 'sword' | 'parrot' | 'monkey' | 'diamond' | 'coin'
+export type Symbol = 'skull' | 'sword' | 'parrot' | 'monkey' | 'diamond' | 'coin';
 
 export type Card =
   | 'chest'
@@ -11,26 +11,38 @@ export type Card =
   | 'ship4'
   | 'coin'
   | 'diamond'
-  | 'animals'
+  | 'animals';
 
 export interface Player {
-  id: string
-  name: string
-  score: number
-  bestRound: number
-  skullIslandTotal: number
-  nbBoatsLoose: number
-  nbBoatsWin: number
-  nbCaptain: number
-  nbCoins: number
-  nbDiamonds: number
-  nbPet: number
-  nbVault: number
-  nbWarden: number
+  id: string;
+  name: string;
+  score: number;
+  bestRound: number;
+  skullIslandTotal: number;
+  treasuresTotal: number;
+  petsTotal: number;
+  nbRoundsLost: number;
+  nbShipsLoose: number;
+  nbShipsWin: number;
+  nbCaptains: number;
+  nbChests: number;
+  nbGuardians: number;
 }
 
-export interface HistoryItem {
-  id: string
-  playerId: string
-  score: number
+export interface Roll {
+  points: number;
+  skullIslandTotal: number;
+  treasuresTotal: number;
+  petsTotal: number;
+  nbRoundsLost: number;
+  nbShipsLoose: number;
+  nbShipsWin: number;
+  nbCaptains: number;
+  nbChests: number;
+  nbGuardians: number;
+}
+
+export interface HistoryItem extends Roll {
+  id: string;
+  playerId: string;
 }

@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import gsap from 'gsap'
+import { defineComponent } from 'vue';
+import gsap from 'gsap';
 
 export default defineComponent({
   name: 'AnimatedNumber',
@@ -12,8 +12,8 @@ export default defineComponent({
   data() {
     return {
       displayValue: this.value,
-      tweenValue: this.value
-    }
+      tweenValue: this.value,
+    };
   },
 
   watch: {
@@ -21,10 +21,10 @@ export default defineComponent({
       gsap.to(this, {
         tweenValue: this.value,
         onUpdate: () => {
-          this.displayValue = Math.ceil(this.tweenValue)
-        }
-      })
-    }
-  }
-})
+          this.displayValue = Math.ceil(this.tweenValue);
+        },
+      });
+    },
+  },
+});
 </script>

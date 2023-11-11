@@ -1,4 +1,4 @@
-label:has(input[type="text"]) {
+label:has(input[type='text']) {
   border-radius: 4px;
   overflow: hidden;
   display: inline-block;
@@ -13,13 +13,14 @@ label:has(input[type="text"]) {
     outline: none;
     transition: 0.3s;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background: rgba($color: #fff, $alpha: 0.5);
     }
   }
 
   &::after {
-    content: "";
+    content: '';
     display: inline-block;
     position: absolute;
     bottom: 0;

@@ -8,42 +8,42 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue'
-import { defineComponent } from 'vue'
-import type { Symbol } from '@/utils/types'
-import { mapState, mapWritableState } from 'pinia'
-import { useRollStore } from '@/stores'
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
+import type { Symbol } from '@/utils/types';
+import { mapState, mapWritableState } from 'pinia';
+import { useRollStore } from '@/stores';
 
 export default defineComponent({
   name: 'DiceSymbol',
   props: {
     type: {
       required: true,
-      type: String as PropType<Symbol>
-    }
+      type: String as PropType<Symbol>,
+    },
   },
   computed: {
     ...mapState(useRollStore, ['isSkullIsland']),
     ...mapWritableState(useRollStore, ['symbols']),
     isRemoveDisabled() {
       if (this.isSkullIsland && this.type === 'skull') {
-        return this.symbols.skull < 5
+        return this.symbols.skull < 5;
       }
-      return this.symbols[this.type] < 1
+      return this.symbols[this.type] < 1;
     },
     isAddDisabled() {
       return (
         (Object.values(this.symbols).reduce((result: number, value: number) => {
-          result += value
-          return result
+          result += value;
+          return result;
         }, 0) as number) > 7
-      )
+      );
     },
     imgPath() {
-      return new URL(`../assets/img/symbols/${this.type}.png`, import.meta.url).href
-    }
-  }
-})
+      return new URL(`../assets/img/symbols/${this.type}.png`, import.meta.url).href;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

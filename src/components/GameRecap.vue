@@ -9,34 +9,34 @@
 </template>
 
 <script lang="ts">
-import { useGameStore, usePlayersStore } from '@/stores'
-import { defineComponent } from 'vue'
-import { mapState } from 'pinia'
-import VModal from './VModal.vue'
+import { useGameStore, usePlayersStore } from '@/stores';
+import { defineComponent } from 'vue';
+import { mapState } from 'pinia';
+import VModal from './VModal.vue';
 
 export default defineComponent({
   name: 'GameRecap',
   components: { VModal },
   data() {
     return {
-      showResult: false
-    }
+      showResult: false,
+    };
   },
   computed: {
     ...mapState(useGameStore, ['gameStarted']),
     ...mapState(usePlayersStore, ['players', 'winners']),
     winnersName() {
-      return this.winners.map(({ name }) => name).join(', ')
-    }
+      return this.winners.map(({ name }) => name).join(', ');
+    },
   },
   watch: {
     gameStarted() {
       if (!this.gameStarted) {
-        this.showResult = true
+        this.showResult = true;
       }
-    }
-  }
-})
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
