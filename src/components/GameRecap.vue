@@ -166,6 +166,10 @@ export default defineComponent({
     margin-top: 0;
     text-align: center;
   }
+
+  p {
+    line-height: 1.2rem;
+  }
 }
 
 .stat-enter-active,
