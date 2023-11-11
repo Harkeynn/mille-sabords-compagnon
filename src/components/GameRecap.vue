@@ -3,6 +3,7 @@
     <div class="game-recap-container">
       <h2>Vainqueur{{ winners.length > 1 ? 's' : '' }} :</h2>
       <h3>{{ winnersName }}</h3>
+      <hr />
       <div v-if="displayedStat" class="game-stats-container">
         <transition name="stat">
           <div :key="displayedStat">
@@ -145,6 +146,13 @@ export default defineComponent({
   h3 {
     font-size: 1.5rem;
     text-align: center;
+    margin: 0;
+  }
+
+  hr {
+    width: calc(100% - 100px);
+    border-color: #000;
+    margin: 20px auto;
   }
 
   button {
