@@ -51,7 +51,11 @@ export default defineComponent({
         result += value;
         return result;
       }, 0);
-      return !this.currentPlayerId || !this.currentCard || diceNb !== 8;
+      return (
+        !this.currentPlayerId ||
+        !this.currentCard ||
+        (diceNb !== 8 && this.computedSymbols.skull < 3)
+      );
     },
   },
   methods: {
@@ -104,7 +108,8 @@ export default defineComponent({
   watch: {
     isSkullIsland() {
       if (this.isSkullIsland) {
-        this.symbols.skull = 4;
+        this.symbols.skull +=
+          4 - this.computedSymbols.skull < 0 ? 0 : 4 - this.computedSymbols.skull;
       }
     },
   },

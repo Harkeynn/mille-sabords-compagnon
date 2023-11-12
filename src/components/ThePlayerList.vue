@@ -158,7 +158,10 @@ export default defineComponent({
 
         this.players = this.players.map((player: Player) => {
           if (player.id !== action.playerId) {
-            return player;
+            return {
+              ...player,
+              score: player.score + action.skullIslandTotal,
+            } as Player;
           }
           return {
             ...Object.keys(player).reduce((result, key) => {
@@ -186,6 +189,14 @@ export default defineComponent({
           1,
         )[0];
         this.history.push(action);
+
+        if (action.skullIslandTotal) {
+          this.players
+            .filter(({ id }) => id !== action.playerId)
+            .forEach((player) => {
+              player.score -= action.skullIslandTotal;
+            });
+        }
 
         this.updatePlayerStats(action.playerId, action as Roll);
       }

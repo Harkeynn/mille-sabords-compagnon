@@ -24,10 +24,11 @@ export default defineComponent({
   },
   computed: {
     ...mapState(useRollStore, ['isSkullIsland']),
+    ...mapState(useRollStore, ['computedSymbols']),
     ...mapWritableState(useRollStore, ['symbols']),
     isRemoveDisabled() {
       if (this.isSkullIsland && this.type === 'skull') {
-        return this.symbols.skull < 5;
+        return this.computedSymbols.skull < 5;
       }
       return this.symbols[this.type] < 1;
     },

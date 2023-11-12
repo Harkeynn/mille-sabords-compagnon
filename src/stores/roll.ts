@@ -108,7 +108,7 @@ export default defineStore('roll', {
         nbShipsLoose: 0,
         nbShipsWin: 0,
         petsTotal: 0,
-        points: this.points,
+        points: this.isSkullIsland ? 0 : this.points,
         skullIslandTotal: 0,
         treasuresTotal: 0,
       };
