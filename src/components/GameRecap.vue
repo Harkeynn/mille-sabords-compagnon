@@ -7,10 +7,10 @@
       <div v-if="displayedStat" class="game-stats-container">
         <transition name="stat">
           <ul v-if="displayAllStats" class="all-stats-container">
-            <li v-for="(stat, key) in stats" :key="key">
+            <li v-for="(stat, key) of existingStats" :key="key">
               <h4>{{ statLabels[key].title }}</h4>
               <span>
-                {{ stat.playerName }} {{ statLabels[key].subtitle }} ({{ stat.points
+                {{ stat?.playerName }} {{ statLabels[key].subtitle }} ({{ stat?.points
                 }}{{ statLabels[key].unit ? ` ${statLabels[key].unit}` : '' }})
               </span>
             </li>
@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { useGameStore, usePlayersStore } from '@/stores';
-import type { BestStats, Player, Stats } from '@/utils/types';
+import type { BestStats, Player, StatItem, Stats } from '@/utils/types';
 import { defineComponent } from 'vue';
 import { mapState } from 'pinia';
 import VModal from './VModal.vue';
@@ -116,6 +116,18 @@ export default defineComponent({
         });
         return result;
       }, {});
+    },
+    existingStats() {
+      return (Object.keys(this.stats) as (keyof BestStats)[]).reduce(
+        (result: BestStats, key: keyof BestStats) => {
+          const value: StatItem | undefined = this.stats[key];
+          if (value !== undefined) {
+            result[key] = value;
+          }
+          return result;
+        },
+        {},
+      );
     },
   },
   methods: {
