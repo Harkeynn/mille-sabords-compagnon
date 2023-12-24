@@ -6,7 +6,16 @@
       <hr />
       <div v-if="displayedStat" class="game-stats-container">
         <transition name="stat">
-          <div :key="displayedStat">
+          <ul v-if="displayAllStats" class="all-stats-container">
+            <li v-for="(stat, key) in stats" :key="key">
+              <h4>{{ statLabels[key].title }}</h4>
+              <span>
+                {{ stat.playerName }} {{ statLabels[key].subtitle }} ({{ stat.points
+                }}{{ statLabels[key].unit ? ` ${statLabels[key].unit}` : '' }})
+              </span>
+            </li>
+          </ul>
+          <div v-else :key="displayedStat">
             <h4>{{ statLabels[displayedStat].title }}</h4>
             <p>
               {{ stats[displayedStat]?.playerName }} {{ statLabels[displayedStat].subtitle }} ({{
@@ -16,6 +25,9 @@
           </div>
         </transition>
       </div>
+      <transition name="fade">
+        <button v-if="!displayAllStats" @click="displayAllStats = true">Afficher les stats</button>
+      </transition>
       <button @click="showResult = false">OK</button>
     </div>
   </VModal>
@@ -36,6 +48,7 @@ export default defineComponent({
       showResult: false,
       statInterval: undefined as undefined | number,
       displayedStat: null as keyof Stats | null,
+      displayAllStats: false,
       statLabels: {
         bestRound: {
           title: "Tireur d'elite",
@@ -124,6 +137,9 @@ export default defineComponent({
         }, 5000);
       }
     },
+    displayAllStats() {
+      clearInterval(this.statInterval);
+    },
   },
   beforeUnmount() {
     clearInterval(this.statInterval);
@@ -132,15 +148,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '../assets/styles/variables';
+
 .game-recap-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 10px;
 
   h2 {
     font-size: 1.2rem;
     text-align: center;
-    margin-bottom: 0;
+    margin: 0;
   }
 
   h3 {
@@ -152,7 +171,7 @@ export default defineComponent({
   hr {
     width: calc(100% - 100px);
     border-color: #000;
-    margin: 20px auto;
+    margin: 10px auto;
   }
 
   button {
@@ -167,7 +186,8 @@ export default defineComponent({
   align-items: flex-start;
   width: 500px;
   max-width: calc(100vw - 20px);
-  height: 120px;
+  min-height: 120px;
+  max-height: 60vh;
 
   h4,
   p {
@@ -177,6 +197,33 @@ export default defineComponent({
 
   p {
     line-height: 1.2rem;
+  }
+
+  .all-stats-container {
+    max-height: 60vh;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr);
+    gap: 10px;
+    text-align: center;
+
+    li {
+      border-radius: 3px;
+      overflow: hidden;
+
+      h4 {
+        color: #fff;
+        margin-bottom: 0;
+        background: $main;
+        padding: 5px;
+      }
+
+      span {
+        background: rgba($color: #fff, $alpha: 0.3);
+        display: inline-block;
+        padding: 10px;
+      }
+    }
   }
 }
 
@@ -200,5 +247,13 @@ export default defineComponent({
 
 .stat-leave-to {
   transform: translateX(-20px);
+}
+
+.fade-leave-active {
+  transition: 0.3s;
+}
+
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
