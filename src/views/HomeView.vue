@@ -92,8 +92,6 @@ export default defineComponent({
               player.score = 0;
             }
           });
-        // currentPlayer.skullIslandTotal++;
-        // currentPlayer.skullIslandTotal -= this.points;
       }
 
       this.updatePlayerStats(currentPlayer.id, this.rollStats);
