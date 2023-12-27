@@ -1,6 +1,13 @@
 <template>
   <div class="dice-symbol">
-    <h3><img :src="imgPath" :alt="type" /></h3>
+    <h3>
+      <img
+        :src="imgPath"
+        :alt="type"
+        @click="isAddDisabled ? undefined : (symbols[type] += 1)"
+        @contextmenu.prevent="isRemoveDisabled ? undefined : (symbols[type] -= 1)"
+      />
+    </h3>
     <button class="round" @click="symbols[type] -= 1" :disabled="isRemoveDisabled">-</button>
     <span>{{ symbols[type] }}</span>
     <button class="round" @click="symbols[type] += 1" :disabled="isAddDisabled">+</button>
@@ -68,6 +75,7 @@ export default defineComponent({
     img {
       border: 2px solid $main;
       border-radius: 10%;
+      cursor: pointer;
     }
   }
 }

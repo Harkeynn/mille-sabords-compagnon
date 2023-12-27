@@ -54,7 +54,7 @@ export default defineComponent({
       return (
         !this.currentPlayerId ||
         !this.currentCard ||
-        (diceNb !== 8 && this.computedSymbols.skull < 3)
+        (this.currentCard !== 'chest' && diceNb !== 8 && this.computedSymbols.skull < 3)
       );
     },
   },
@@ -92,7 +92,8 @@ export default defineComponent({
               player.score = 0;
             }
           });
-        currentPlayer.skullIslandTotal -= this.points;
+        // currentPlayer.skullIslandTotal++;
+        // currentPlayer.skullIslandTotal -= this.points;
       }
 
       this.updatePlayerStats(currentPlayer.id, this.rollStats);

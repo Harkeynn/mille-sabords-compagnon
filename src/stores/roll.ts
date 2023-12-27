@@ -71,7 +71,7 @@ export default defineStore('roll', {
           valuedDices -= 1;
           break;
       }
-      if (!this.isSkullIsland && this.computedSymbols.skull > 2) {
+      if (!this.isSkullIsland && this.currentCard !== 'chest' && this.computedSymbols.skull > 2) {
         return 0;
       }
 
@@ -82,14 +82,16 @@ export default defineStore('roll', {
       }
       result += (Object.keys(this.computedSymbols) as (Symbol | 'animals')[]).reduce(
         (totalValue, key) => {
-          const comboScore = getComboScore(
-            this.computedSymbols[key],
-            ['coin', 'diamond'].includes(key),
-          );
-          if (comboScore > 0) {
-            valuedDices += this.computedSymbols[key];
+          if (key !== 'skull') {
+            const comboScore = getComboScore(
+              this.computedSymbols[key],
+              ['coin', 'diamond'].includes(key),
+            );
+            if (comboScore > 0) {
+              valuedDices += this.computedSymbols[key];
+            }
+            totalValue += comboScore;
           }
-          totalValue += comboScore;
           return totalValue;
         },
         0,
@@ -108,7 +110,7 @@ export default defineStore('roll', {
         nbShipsLoose: 0,
         nbShipsWin: 0,
         petsTotal: 0,
-        points: this.isSkullIsland ? 0 : this.points,
+        points: this.points,
         skullIslandTotal: 0,
         treasuresTotal: 0,
       };
@@ -123,7 +125,7 @@ export default defineStore('roll', {
           result.nbRoundsLost++;
           result.nbShipsLoose++;
         } else {
-          result.skullIslandTotal -= this.points;
+          result.skullIslandTotal++;
         }
       } else {
         // Ship win

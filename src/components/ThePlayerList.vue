@@ -157,28 +157,33 @@ export default defineComponent({
         this.reversedActions.push(action);
 
         this.players = this.players.map((player: Player) => {
-          if (player.id !== action.playerId) {
-            return {
+          let tempPlayer = { ...player };
+          if (action.skullIslandTotal && player.id !== action.playerId) {
+            tempPlayer = {
               ...player,
-              score: player.score + action.skullIslandTotal,
+              score: player.score - action.points,
             } as Player;
           }
-          return {
-            ...Object.keys(player).reduce((result, key) => {
-              if (key !== 'id' && Object.prototype.hasOwnProperty.call(action, key)) {
-                (result[key as keyof Player] as number) -= action[
-                  key as keyof HistoryItem
-                ] as number;
-              }
-              return result;
-            }, player as Player),
-            score: player.score - action.points,
-            bestRound: Math.max(
-              ...this.history
-                .filter(({ playerId }) => playerId === player.id)
-                .map(({ points }) => points),
-            ),
-          } as Player;
+          if (player.id === action.playerId) {
+            return {
+              ...Object.keys(tempPlayer).reduce((result, key) => {
+                if (key !== 'id' && Object.prototype.hasOwnProperty.call(action, key)) {
+                  (result[key as keyof Player] as number) -= action[
+                    key as keyof HistoryItem
+                  ] as number;
+                }
+                return result;
+              }, tempPlayer as Player),
+              score: action.skullIslandTotal ? tempPlayer.score : tempPlayer.score - action.points,
+              bestRound: Math.max(
+                ...this.history
+                  .filter(({ playerId }) => playerId === tempPlayer.id)
+                  .map(({ points }) => points),
+              ),
+            } as Player;
+          } else {
+            return tempPlayer;
+          }
         });
       }
     },
@@ -194,7 +199,7 @@ export default defineComponent({
           this.players
             .filter(({ id }) => id !== action.playerId)
             .forEach((player) => {
-              player.score -= action.skullIslandTotal;
+              player.score += action.points;
             });
         }
 
