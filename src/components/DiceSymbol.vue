@@ -5,7 +5,6 @@
         :src="imgPath"
         :alt="type"
         @click="isAddDisabled ? undefined : (symbols[type] += 1)"
-        @touchend="isAddDisabled ? undefined : (symbols[type] += 1)"
         @contextmenu.prevent="isRemoveDisabled ? undefined : (symbols[type] -= 1)"
       />
     </h3>
