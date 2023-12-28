@@ -28,7 +28,9 @@ export default defineStore('players', {
           this.players[playerIndex].bestRound = roll.points;
         }
 
-        this.players[playerIndex].score += roll.points;
+        if (!roll.skullIslandTotal) {
+          this.players[playerIndex].score += roll.points;
+        }
         if (this.players[playerIndex].score < 0) {
           this.players[playerIndex].score = 0;
         }

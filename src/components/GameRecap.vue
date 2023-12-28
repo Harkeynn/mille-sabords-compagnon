@@ -4,9 +4,23 @@
       <h2>Vainqueur{{ winners.length > 1 ? 's' : '' }} :</h2>
       <h3>{{ winnersName }}</h3>
       <hr />
-      <div v-if="displayedStat" class="game-stats-container">
+      <div class="game-stats-container">
         <transition name="stat">
-          <ul v-if="displayAllStats" class="all-stats-container">
+          <VTabs
+            v-if="displayAllStats"
+            v-model="currentPlayerStats"
+            :tabs="players.map(({ id, name }) => ({ key: id, title: name }))"
+          >
+            <template v-for="player of players" :key="player.id" v-slot:[player.id]>
+              <ul class="player-stats-container">
+                <li v-for="(label, key) of playerStatLabels" :key="key">
+                  <span>{{ label }}</span
+                  ><AnimatedNumber :value="player[key]" />
+                </li>
+              </ul>
+            </template>
+          </VTabs>
+          <ul v-else class="all-stats-container">
             <li v-for="(stat, key) of existingStats" :key="key">
               <h4>{{ statLabels[key].title }}</h4>
               <span>
@@ -15,19 +29,11 @@
               </span>
             </li>
           </ul>
-          <div v-else :key="displayedStat">
-            <h4>{{ statLabels[displayedStat].title }}</h4>
-            <p>
-              {{ stats[displayedStat]?.playerName }} {{ statLabels[displayedStat].subtitle }} ({{
-                stats[displayedStat]?.points
-              }}{{ statLabels[displayedStat].unit ? ` ${statLabels[displayedStat].unit}` : '' }})
-            </p>
-          </div>
         </transition>
       </div>
-      <transition name="fade">
-        <button v-if="!displayAllStats" @click="displayAllStats = true">Afficher les stats</button>
-      </transition>
+      <button @click="displayAllStats = !displayAllStats">
+        {{ displayAllStats ? 'Retour aux stats de la partie' : 'Afficher les stats completes' }}
+      </button>
       <button @click="showResult = false">OK</button>
     </div>
   </VModal>
@@ -39,15 +45,16 @@ import type { BestStats, Player, StatItem, Stats } from '@/utils/types';
 import { defineComponent } from 'vue';
 import { mapState } from 'pinia';
 import VModal from './VModal.vue';
+import VTabs from './VTabs.vue';
+import AnimatedNumber from './AnimatedNumber.vue';
 
 export default defineComponent({
   name: 'GameRecap',
-  components: { VModal },
+  components: { VModal, VTabs, AnimatedNumber },
   data() {
     return {
+      currentPlayerStats: null,
       showResult: false,
-      statInterval: undefined as undefined | number,
-      displayedStat: null as keyof Stats | null,
       displayAllStats: false,
       statLabels: {
         bestRound: {
@@ -95,6 +102,19 @@ export default defineComponent({
           unit: 'points',
         },
       } as Record<keyof Stats, { title: string; subtitle: string; unit?: string }>,
+      playerStatLabels: {
+        score: 'Score final',
+        bestRound: 'Meilleur tour',
+        nbCaptains: 'Capitaine(s) pioche(s)',
+        nbChests: 'Coffre(s) pioche(s)',
+        nbGuardians: 'Gardien(s) pioche(s)',
+        nbRoundsLost: 'Tour(s) perdu(s)',
+        nbShipsLoose: 'Bataille(s) navale(s) perdue(s)',
+        nbShipsWin: 'Bataille(s) navale(s) gagnee(s)',
+        petsTotal: 'Point(s) gagne(s) grace aux animaux',
+        skullIslandTotal: "Visite(s) sur l'Ile de la Tete de Mort",
+        treasuresTotal: 'Point(s) gagne(s) grace aux richesses',
+      },
     };
   },
   computed: {
@@ -130,31 +150,15 @@ export default defineComponent({
       );
     },
   },
-  methods: {
-    setupDisplayedStat() {
-      const statsArray = Object.keys(this.stats);
-      const statIndex = statsArray.indexOf(this.displayedStat as string);
-      this.displayedStat = statsArray[
-        statIndex === statsArray.length - 1 ? 0 : statIndex + 1
-      ] as keyof Stats;
-    },
-  },
   watch: {
     gameStarted() {
       if (!this.gameStarted) {
         this.showResult = true;
-        this.setupDisplayedStat();
-        this.statInterval = setInterval(() => {
-          this.setupDisplayedStat();
-        }, 5000);
       }
     },
-    displayAllStats() {
-      clearInterval(this.statInterval);
+    'players.length'() {
+      this.currentPlayerStats = this.players[0]?.id || null;
     },
-  },
-  beforeUnmount() {
-    clearInterval(this.statInterval);
   },
 });
 </script>
@@ -209,6 +213,18 @@ export default defineComponent({
 
   p {
     line-height: 1.2rem;
+  }
+
+  .player-stats-container {
+    li {
+      padding: 5px;
+      display: flex;
+      justify-content: space-between;
+
+      &:nth-child(odd) {
+        background: rgba($color: #000, $alpha: 0.2);
+      }
+    }
   }
 
   .all-stats-container {

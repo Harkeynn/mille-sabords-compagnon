@@ -193,7 +193,7 @@ export default defineComponent({
           this.reversedActions.length - 1,
           1,
         )[0];
-        this.history.push(action);
+        this.history = [action];
 
         if (action.skullIslandTotal) {
           this.players

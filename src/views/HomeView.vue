@@ -95,11 +95,13 @@ export default defineComponent({
       }
 
       this.updatePlayerStats(currentPlayer.id, this.rollStats);
-      this.history.push({
-        id: uuid(),
-        playerId: currentPlayer.id,
-        ...this.rollStats,
-      } as HistoryItem);
+      this.history = [
+        {
+          id: uuid(),
+          playerId: currentPlayer.id,
+          ...this.rollStats,
+        } as HistoryItem,
+      ];
       this.reversedActions = [];
       this.reset();
     },
