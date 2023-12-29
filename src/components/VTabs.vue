@@ -14,7 +14,8 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'VTabs',
@@ -41,14 +42,16 @@ export default defineComponent({
       get() {
         return this.modelValue;
       },
-      set(value) {
+      set(value: string | null) {
         this.$emit('update:modelValue', value);
       },
     },
   },
   methods: {
     setupHighlight() {
-      const tabRef = this.$refs[this.currentTab]?.[0];
+      const tabRef = (
+        (this.$refs[this.currentTab as keyof typeof this.$refs] || []) as HTMLLIElement[]
+      )[0];
       if (tabRef) {
         this.highlightPosition = {
           left: tabRef.offsetLeft,

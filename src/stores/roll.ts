@@ -42,9 +42,10 @@ export default defineStore('roll', {
     points(): number {
       let valuedDices = 0;
       let result = 0;
+      const skullLoose = this.computedSymbols.skull > 2;
       switch (this.currentCard) {
         case 'ship2':
-          if (this.computedSymbols.sword < 2) {
+          if (this.computedSymbols.sword < 2 || skullLoose) {
             return -300;
           }
           if (this.computedSymbols.sword === 2) {
@@ -53,13 +54,13 @@ export default defineStore('roll', {
           result += 300;
           break;
         case 'ship3':
-          if (this.computedSymbols.sword < 3) {
+          if (this.computedSymbols.sword < 3 || skullLoose) {
             return -500;
           }
           result += 500;
           break;
         case 'ship4':
-          if (this.computedSymbols.sword < 4) {
+          if (this.computedSymbols.sword < 4 || skullLoose) {
             return -1000;
           }
           result += 1000;
@@ -71,7 +72,7 @@ export default defineStore('roll', {
           valuedDices -= 1;
           break;
       }
-      if (!this.isSkullIsland && this.currentCard !== 'chest' && this.computedSymbols.skull > 2) {
+      if (!this.isSkullIsland && this.currentCard !== 'chest' && skullLoose) {
         return 0;
       }
 

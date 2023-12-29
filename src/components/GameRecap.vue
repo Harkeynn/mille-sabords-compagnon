@@ -53,7 +53,7 @@ export default defineComponent({
   components: { VModal, VTabs, AnimatedNumber },
   data() {
     return {
-      currentPlayerStats: null,
+      currentPlayerStats: null as string | null,
       showResult: false,
       displayAllStats: false,
       statLabels: {
